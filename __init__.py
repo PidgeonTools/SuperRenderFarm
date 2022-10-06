@@ -248,7 +248,7 @@ def render_srf(context):
 
     jS = json.dumps(jO)
 
-    subprocess.call([sys.executable, context.preferences.addons["Super Render Farm"].preferences.script_location, "--", jS], creationflags=CREATE_NEW_CONSOLE)
+    subprocess.call([sys.executable, context.preferences.addons[__package__].preferences.script_location, "--", jS], creationflags=CREATE_NEW_CONSOLE)
 
     if scene.exit_blender:
         bpy.ops.wm.quit_blender()
@@ -308,7 +308,7 @@ class SRF_PT_panel(Panel):
 class SRF_APT_Preferences(AddonPreferences):
     bl_idname = __package__
 
-    script_location:StringProperty(subtype="DIR_PATH")
+    script_location: StringProperty(subtype="DIR_PATH")
 
     def draw(self, context: bpy.types.Context):
         layout = self.layout
