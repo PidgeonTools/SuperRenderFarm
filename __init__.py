@@ -34,6 +34,15 @@ from bpy.types import (
     Operator
 )
 
+import os
+import sys
+
+import json
+
+import time
+
+import subprocess
+from subprocess import CREATE_NEW_CONSOLE
 
 bl_info = {
     "name": "Super Render Farm",
@@ -50,43 +59,121 @@ bl_info = {
     "category": "Render",
 }
 
-# class properties(PropertyGroup):
-#     string: StringProperty(
-#         name = "String",
-#         description = "Test",
-#         default = ""
-#     )
-    
-#     bool: BoolProperty(
-#         name = "Bool",
-#         description = "Test",
-#         default = False
-#     )
 
-#     int: IntProperty(
-#         name = "Int",
-#         description = "Test",
-#         default = 0,
-#         min = 0,
-#         max = 10
-#     )
+class SRF_OT_render_button(Operator):
+    bl_idname = "superrenderfarm.render"
+    bl_label = "Render with SRF"
 
-#     float: FloatProperty(
-#         name = "Float",
-#         description = "Test",
-#         default = 0.0,
-#         min = 0.0,
-#         max = 10.0
-#     )
-    
-#     enum: EnumProperty(
-#         name = "Enum",
-#         description = "",
-#         items = [
-#                 ('OP1', "Test", "")
-#         ],
-#         #update=LoadPreset
-#     )
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        scene = context.scene
+        
+
+        jO = {
+            "VER": bpy.app.version_string,
+            "FS": scene.frame_start,
+            "FE": scene.frame_end,
+            "RE": scene.render.engine,
+            "FF": scene.render.image_settings.file_format,
+            "RT": scene.render_time
+        }
+
+        if scene.test_render_time:
+            startTime = time.time()
+            bpy.ops.render.render()
+            jO["RT"] = time.time() - startTime
+
+        if jO["FF"] in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
+            jO["FF"] = scene.file_format
+
+        jO["V"] = scene.video
+
+        if jO["V"]:
+            jO["FPS"] = scene.render.fps #scene.fps
+            jO["VRC"] = scene.vrc
+            jO["VRCV"] = scene.vrc_value
+
+            jO["R"] = scene.resize
+
+            if jO["R"]:
+                jO["RESX"] = scene.res_x
+                jO["RESY"] = scene.res_y
+
+        jS = json.dumps(jO)
+
+        subprocess.call([sys.executable, context.preferences.addons[__package__].preferences.script_location, "--", jS], creationflags=CREATE_NEW_CONSOLE)
+
+        if scene.exit_blender:
+            bpy.ops.wm.quit_blender()
+
+        return {'FINISHED'}
+
+
+class SRF_PT_panel(Panel):
+    bl_label = "Super Render Farm"
+    bl_idname = "SRF_PT_panel"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "render"
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+
+        row = layout.row()
+        row.prop(scene, "test_render_time")
+
+        if not scene.test_render_time:
+            row = layout.row()
+            row.prop(scene, "render_time")
+
+        if bpy.context.scene.render.image_settings.file_format in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
+            row = layout.row()
+            row.prop(scene, "file_format")
+        
+        row = layout.row()
+        row.prop(scene, "video")
+        
+        if scene.video:
+            #row = layout.row()
+            #row.prop(scene, "fps")
+            
+            row = layout.row()
+            row.prop(scene, "vrc")
+            
+            row = layout.row()
+            row.prop(scene, "vrc_value")
+            
+            row = layout.row()
+            row.prop(scene, "resize")
+            
+            if scene.resize:
+                row = layout.row()
+                row.prop(scene, "res_x")
+                #row = layout.row()
+                row.prop(scene, "res_y")
+
+            row = layout.row()
+            row.prop(scene, "exit_blender")
+
+        row = layout.row()
+        row = layout.row()
+        row = layout.row()
+        row.operator("superrenderfarm.render")#, text="Overwrite")
+
+class SRF_APT_Preferences(AddonPreferences):
+    bl_idname = __package__
+
+    script_location: StringProperty(subtype="DIR_PATH", name="Script Location", description="Installation directory of Red-Render-Farm")
+
+    def draw(self, context: bpy.types.Context):
+        layout = self.layout
+
+        layout.prop(self, "script_location")
+
 
 def register_properties():
     s = bpy.types.Scene
@@ -189,134 +276,12 @@ def register_properties():
 
     s.exit_blender = BoolProperty(
         name = "Exit Blender",
-        description = "",
+        description = "Exit Blender while rendering.",
         default = False
     )
 
-class SRF_OT_render_button(Operator):
-    bl_idname = "superrenderfarm.render"
-    bl_label = "Render with SRF"
-
-    @classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        render_srf(context)
-
-        return {'FINISHED'}
-
-def render_srf(context):
-    scene = context.scene
-    
-    import json
-    import sys
-    import os
-    import time
-    import subprocess
-    from subprocess import CREATE_NEW_CONSOLE
-
-    jO = {
-    "VER": bpy.app.version_string,
-    "FS": scene.frame_start,
-    "FE": scene.frame_end,
-    "RE": scene.render.engine,
-    "FF": scene.render.image_settings.file_format,
-    "RT": scene.render_time
-    }
-
-    if scene.test_render_time:
-        startTime = time.time()
-        bpy.ops.render.render()
-        jO["RT"] = time.time() - startTime
-
-    if jO["FF"] in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
-        jO["FF"] = scene.file_format
-
-    jO["V"] = scene.video
-
-    if jO["V"]:
-        jO["FPS"] = scene.render.fps #scene.fps
-        jO["VRC"] = scene.vrc
-        jO["VRCV"] = scene.vrc_value
-
-        jO["R"] = scene.resize
-
-        if jO["R"]:
-            jO["RESX"] = scene.res_x
-            jO["RESY"] = scene.res_y
-
-    jS = json.dumps(jO)
-
-    subprocess.call([sys.executable, context.preferences.addons[__package__].preferences.script_location, "--", jS], creationflags=CREATE_NEW_CONSOLE)
-
-    if scene.exit_blender:
-        bpy.ops.wm.quit_blender()
- 
-class SRF_PT_panel(Panel):
-    bl_label = "Super Render Farm"
-    bl_idname = "SRF_PT_panel"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = "render"
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        row = layout.row()
-        row.prop(scene, "test_render_time")
-
-        if not scene.test_render_time:
-            row = layout.row()
-            row.prop(scene, "render_time")
-
-        if bpy.context.scene.render.image_settings.file_format in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
-            row = layout.row()
-            row.prop(scene, "file_format")
-        
-        row = layout.row()
-        row.prop(scene, "video")
-        
-        if scene.video:
-            #row = layout.row()
-            #row.prop(scene, "fps")
-            
-            row = layout.row()
-            row.prop(scene, "vrc")
-            
-            row = layout.row()
-            row.prop(scene, "vrc_value")
-            
-            row = layout.row()
-            row.prop(scene, "resize")
-            
-            if scene.resize:
-                row = layout.row()
-                row.prop(scene, "res_x")
-                #row = layout.row()
-                row.prop(scene, "res_y")
-
-            row = layout.row()
-            row.prop(scene, "exit_blender")
-
-        row = layout.row()
-        row = layout.row()
-        row = layout.row()
-        row.operator("superrenderfarm.render")#, text="Overwrite")
-
-class SRF_APT_Preferences(AddonPreferences):
-    bl_idname = __package__
-
-    script_location: StringProperty(subtype="DIR_PATH")
-
-    def draw(self, context: bpy.types.Context):
-        layout = self.layout
-
-        layout.prop(self, "script_location")
 
 classes = (
-    # properties,
     SRF_OT_render_button,
     SRF_PT_panel,
     SRF_APT_Preferences
@@ -329,15 +294,9 @@ def register():
         bpy.utils.register_class(cls)
 
     
-    # bpy.types.Scene.properties = bpy.props.PointerProperty(type = properties)
-
-
 def unregister():
     for cls in reversed(classes):
         bpy.utils.register_class(cls)
     
-    # del bpy.types.Scene.properties
-
-
 if __name__ == "__main__":
     register()
