@@ -21,28 +21,17 @@
 
 import bpy
 from bpy.props import (
-    StringProperty,
     BoolProperty,
     IntProperty,
-    FloatProperty,
     EnumProperty
 )
-from bpy.types import (
-    PropertyGroup,
-    Panel,
-    AddonPreferences,
-    Operator
+
+from . import (
+    operators,
+    panels,
+    prefs
 )
 
-import os
-import sys
-
-import json
-
-import time
-
-import subprocess
-from subprocess import CREATE_NEW_CONSOLE
 
 bl_info = {
     "name": "Super Render Farm",
@@ -60,243 +49,130 @@ bl_info = {
 }
 
 
-class SRF_OT_render_button(Operator):
-    bl_idname = "superrenderfarm.render"
-    bl_label = "Render with SRF"
-
-    @classmethod
-    def poll(cls, context):
-        return context.active_object is not None
-
-    def execute(self, context):
-        scene = context.scene
-        
-
-        jO = {
-            "VER": bpy.app.version_string,
-            "FS": scene.frame_start,
-            "FE": scene.frame_end,
-            "RE": scene.render.engine,
-            "FF": scene.render.image_settings.file_format,
-            "RT": scene.render_time
-        }
-
-        if scene.test_render_time:
-            startTime = time.time()
-            bpy.ops.render.render()
-            jO["RT"] = time.time() - startTime
-
-        if jO["FF"] in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
-            jO["FF"] = scene.file_format
-
-        jO["V"] = scene.video
-
-        if jO["V"]:
-            jO["FPS"] = scene.render.fps #scene.fps
-            jO["VRC"] = scene.vrc
-            jO["VRCV"] = scene.vrc_value
-
-            jO["R"] = scene.resize
-
-            if jO["R"]:
-                jO["RESX"] = scene.res_x
-                jO["RESY"] = scene.res_y
-
-        jS = json.dumps(jO)
-
-        subprocess.call([sys.executable, context.preferences.addons[__package__].preferences.script_location, "--", jS], creationflags=CREATE_NEW_CONSOLE)
-
-        if scene.exit_blender:
-            bpy.ops.wm.quit_blender()
-
-        return {'FINISHED'}
-
-
-class SRF_PT_panel(Panel):
-    bl_label = "Super Render Farm"
-    bl_idname = "SRF_PT_panel"
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = "render"
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        row = layout.row()
-        row.prop(scene, "test_render_time")
-
-        if not scene.test_render_time:
-            row = layout.row()
-            row.prop(scene, "render_time")
-
-        if bpy.context.scene.render.image_settings.file_format in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
-            row = layout.row()
-            row.prop(scene, "file_format")
-        
-        row = layout.row()
-        row.prop(scene, "video")
-        
-        if scene.video:
-            #row = layout.row()
-            #row.prop(scene, "fps")
-            
-            row = layout.row()
-            row.prop(scene, "vrc")
-            
-            row = layout.row()
-            row.prop(scene, "vrc_value")
-            
-            row = layout.row()
-            row.prop(scene, "resize")
-            
-            if scene.resize:
-                row = layout.row()
-                row.prop(scene, "res_x")
-                #row = layout.row()
-                row.prop(scene, "res_y")
-
-            row = layout.row()
-            row.prop(scene, "exit_blender")
-
-        row = layout.row()
-        row = layout.row()
-        row = layout.row()
-        row.operator("superrenderfarm.render")#, text="Overwrite")
-
-class SRF_APT_Preferences(AddonPreferences):
-    bl_idname = __package__
-
-    script_location: StringProperty(subtype="DIR_PATH", name="Script Location", description="Installation directory of Red-Render-Farm")
-
-    def draw(self, context: bpy.types.Context):
-        layout = self.layout
-
-        layout.prop(self, "script_location")
-
-
 def register_properties():
     s = bpy.types.Scene
     #-----  -----#
-    
+
     s.test_render_time = BoolProperty(
-        name = "Test Render Time",
-        description = "Render one test frame to approximate the render time per frame",
-        default = False
+        name="Test Render Time",
+        description="Render one test frame to approximate the render time per frame",
+        default=False
     )
 
     s.render_time = IntProperty(
-        name = "Render Time",
-        description = "",
-        default = 0,
-        min = 0,
+        name="Render Time",
+        description="",
+        default=0,
+        min=0,
         #max = 10
     )
 
     s.file_format = EnumProperty(
-        name = "File Format",
-        description = "Because you have a video format selected, you now have the option to change that.",
-        items = [
-                ('PNG', "PNG", ""),
-                ('BMP', "BMP", ""),
-                #('IRIZ', "IRIZ", ""),
-                ('IRIS', "Iris", ""),
-                ('JPEG', "JPEG", ""),
-                ('RAWTGA', "Targa RAW", ""),
-                ('TGA', "Targa", ""),
+        name="File Format",
+        description="Because you have a video format selected, you now have the option to change that.",
+        items=[
+            ('PNG', "PNG", ""),
+            ('BMP', "BMP", ""),
+            #('IRIZ', "IRIZ", ""),
+            ('IRIS', "Iris", ""),
+            ('JPEG', "JPEG", ""),
+            ('RAWTGA', "Targa RAW", ""),
+            ('TGA', "Targa", ""),
 
-                ('WEBP', "WebP", "Experimental!"),
-                ('JP2', "JPEG 2000", "Experimental!"),
-                #('DDS', "DDS", "Experimental!"),
-                ('DPX', "DPX", "Experimental!"),
-                ('CINEON', "Cineon", "Experimental!"),
-                ('OPEN_EXR_MULTILAYER', "OpenEXR Multilayer", "Experimental!"),
-                ('OPEN_EXR', "OpenEXR", "Experimental!"),
-                ('TIFF', "TIFF", "Experimental!"),
-                ('HDR', "Radiance HDR", "Experimental!"),
+            ('WEBP', "WebP", "Experimental!"),
+            ('JP2', "JPEG 2000", "Experimental!"),
+            #('DDS', "DDS", "Experimental!"),
+            ('DPX', "DPX", "Experimental!"),
+            ('CINEON', "Cineon", "Experimental!"),
+            ('OPEN_EXR_MULTILAYER', "OpenEXR Multilayer", "Experimental!"),
+            ('OPEN_EXR', "OpenEXR", "Experimental!"),
+            ('TIFF', "TIFF", "Experimental!"),
+            ('HDR', "Radiance HDR", "Experimental!"),
         ],
 
-        #         
-        #update=LoadPreset
+        #
+        # update=LoadPreset
     )
-    
+
     s.video = BoolProperty(
-        name = "Generate Video",
-        description = "",
-        default = False
+        name="Generate Video",
+        description="",
+        default=False
     )
-    
+
     s.fps = IntProperty(
-        name = "Video FPS",
-        description = "",
-        default = 24,
-        min = 1,
+        name="Video FPS",
+        description="",
+        default=24,
+        min=1,
         #max = 10
     )
-    
+
     s.vrc = EnumProperty(
-        name = "Video Rate Control",
-        description = "",
-        items = [
-                ('CBR', "CBR", "Constant Bitrate"),
-                ('CRF', "CRF", "Constant Quality")
+        name="Video Rate Control",
+        description="",
+        items=[
+            ('CBR', "CBR", "Constant Bitrate"),
+            ('CRF', "CRF", "Constant Quality")
         ],
-        #update=LoadPreset
+        # update=LoadPreset
     )
-    
+
     s.vrc_value = IntProperty(
-        name = "Video Rate Control Value",
-        description = "Test",
-        default = 0,
-        min = 0,
+        name="Video Rate Control Value",
+        description="Test",
+        default=0,
+        min=0,
         #max = 10
     )
-    
+
     s.resize = BoolProperty(
-        name = "Resize the video",
-        description = "",
-        default = False
+        name="Resize the video",
+        description="",
+        default=False
     )
-    
+
     s.res_x = IntProperty(
-        name = "New video width",
-        description = "Test",
-        default = 1920,
-        min = 1,
+        name="New video width",
+        description="Test",
+        default=1920,
+        min=1,
         #max = 10
     )
-    
+
     s.res_y = IntProperty(
-        name = "New video height",
-        description = "Test",
-        default = 1080,
-        min = 1,
+        name="New video height",
+        description="Test",
+        default=1080,
+        min=1,
         #max = 10
     )
 
     s.exit_blender = BoolProperty(
-        name = "Exit Blender",
-        description = "Exit Blender while rendering.",
-        default = False
+        name="Exit Blender",
+        description="Exit Blender while rendering.",
+        default=False
     )
 
 
-classes = (
-    SRF_OT_render_button,
-    SRF_PT_panel,
-    SRF_APT_Preferences
+modules = (
+    operators,
+    panels,
+    prefs
 )
+
 
 def register():
     register_properties()
 
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    for mod in modules:
+        mod.register()
 
-    
+
 def unregister():
-    for cls in reversed(classes):
-        bpy.utils.register_class(cls)
-    
-if __name__ == "__main__":
-    register()
+    for mod in reversed(modules):
+        mod.unregister()
+
+
+# if __name__ == "__main__":
+#     register()
