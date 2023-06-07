@@ -37,6 +37,9 @@ class SRF_PT_panel(Panel):
         scene = context.scene
 
         row = layout.row()
+        row.prop(scene, "chunk_size")
+
+        row = layout.row()
         row.prop(scene, "test_render_time")
 
         if not scene.test_render_time:

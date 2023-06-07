@@ -48,39 +48,45 @@ class SRF_OT_render_button(Operator):
         scene = context.scene
 
         jO = {
-            "VER": bpy.app.version_string,
-            "FS": scene.frame_start,
-            "FE": scene.frame_end,
-            "RE": scene.render.engine,
-            "FF": scene.render.image_settings.file_format,
-            "RT": scene.render_time
+            "blender_version": bpy.app.version_string,
+            "first_frame": scene.frame_start,
+            "last_frame": scene.frame_end,
+            "frames_total": (scene.frame_end - (scene.frame_start - 1)),
+            "render_engine": scene.render.engine,
+            "output_file_format": scene.render.image_settings.file_format,
+            "time_per_frame": scene.render_time,
+            "chunks": scene.chunk_size,
         }
 
         if scene.test_render_time:
             startTime = time.time()
             bpy.ops.render.render()
-            jO["RT"] = time.time() - startTime
+            jO["time_per_frame"] = time.time() - startTime
 
-        if jO["FF"] in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
-            jO["FF"] = scene.file_format
+        if jO["output_file_format"] in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
+            jO["output_file_format"] = scene.file_format
 
-        jO["V"] = scene.video
+        jO["video_generate"] = scene.video
 
-        if jO["V"]:
-            jO["FPS"] = scene.render.fps  # scene.fps
-            jO["VRC"] = scene.vrc
-            jO["VRCV"] = scene.vrc_value
+        if jO["video_generate"]:
+            jO["video_fps"] = scene.render.fps  # scene.fps
+            jO["video_rate_control"] = scene.vrc
+            jO["video_rate_control_value"] = scene.vrc_value
 
-            jO["R"] = scene.resize
+            jO["video_resize"] = scene.resize
 
-            if jO["R"]:
-                jO["RESX"] = scene.res_x
-                jO["RESY"] = scene.res_y
+            if jO["video_resize"]:
+                jO["video_x"] = scene.res_x
+                jO["video_y"] = scene.res_y
 
-        jS = json.dumps(jO)
+        jS = json.dumps(jO).replace(" ", "")
+        jS = jS.replace("false", "False")
+        jS = jS.replace("true", "True")
 
-        subprocess.call([sys.executable, context.preferences.addons[__package__]
-                         .preferences.script_location, "--", jS], creationflags=CREATE_NEW_CONSOLE)
+        print(jS)
+
+        subprocess.call([context.preferences.addons[__package__]
+                         .preferences.script_location, jS], creationflags=CREATE_NEW_CONSOLE)
 
         if scene.exit_blender:
             bpy.ops.wm.quit_blender()

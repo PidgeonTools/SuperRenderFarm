@@ -53,6 +53,13 @@ def register_properties():
     s = bpy.types.Scene
     #-----  -----#
 
+    s.chunk_size = IntProperty(
+        name="Chunk size",
+        description="Specify the chunk size",
+        default=1,
+        min=1
+    )
+
     s.test_render_time = BoolProperty(
         name="Test Render Time",
         description="Render one test frame to approximate the render time per frame",

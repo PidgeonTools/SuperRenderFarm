@@ -39,3 +39,17 @@ class SRF_APT_Preferences(AddonPreferences):
         layout = self.layout
 
         layout.prop(self, "script_location")
+
+classes = (
+    SRF_APT_Preferences,
+)
+
+
+def register():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
+
+def unregister():
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
