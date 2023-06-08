@@ -35,7 +35,7 @@ from . import (
 
 bl_info = {
     "name": "Super Render Farm",
-    "author": "Crafto1337, Pidgeon Tools, Blender Defender",
+    "author": "Pidgeon Tools: Crafto1337, Blender Defender",
     "version": (0, 0, 1),
     "blender": (2, 93, 0),
     # TODO: Maybe find a shorter description. This description is very long.
@@ -153,6 +153,12 @@ def register_properties():
         default=1080,
         min=1,
         #max = 10
+    )
+
+    s.use_sfr = BoolProperty(
+        name="Opimize with SFR",
+        description="Use SuperFastRender to find ideal render settings (sampples in relation to time).",
+        default=False
     )
 
     s.exit_blender = BoolProperty(

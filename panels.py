@@ -72,8 +72,10 @@ class SRF_PT_panel(Panel):
                 #row = layout.row()
                 row.prop(scene, "res_y")
 
-            row = layout.row()
-            row.prop(scene, "exit_blender")
+        row = layout.row()
+        row.prop(scene, "use_sfr")
+        row = layout.row()
+        row.prop(scene, "exit_blender")
 
         row = layout.row()
         row = layout.row()

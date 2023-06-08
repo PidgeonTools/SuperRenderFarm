@@ -58,6 +58,14 @@ class SRF_OT_render_button(Operator):
             "chunks": scene.chunk_size,
         }
 
+        # Try to call SFR
+        try:
+            bpy.ops.render.superfastrender_benchmark()
+            # Save the new settings
+            bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
+        except AttributeError:
+            print("SuperFastRender is NOT installed!")
+
         if scene.test_render_time:
             startTime = time.time()
             bpy.ops.render.render()
