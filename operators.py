@@ -56,6 +56,7 @@ class SRF_OT_render_button(Operator):
             "output_file_format": scene.render.image_settings.file_format,
             "time_per_frame": scene.render_time,
             "chunks": scene.chunk_size,
+            #"use_zip": scene.use_zip,
         }
 
         # Try to call SFR

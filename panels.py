@@ -50,12 +50,12 @@ class SRF_PT_panel(Panel):
             row = layout.row()
             row.prop(scene, "file_format")
 
-        row = layout.row()
-        row.prop(scene, "video")
+        #row = layout.row()
+        #row.prop(scene, "video")
 
         if scene.video:
-            #row = layout.row()
-            #row.prop(scene, "fps")
+            row = layout.row()
+            row.prop(scene, "fps")
 
             row = layout.row()
             row.prop(scene, "vrc")

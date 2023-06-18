@@ -55,9 +55,15 @@ def register_properties():
 
     s.chunk_size = IntProperty(
         name="Chunk size",
-        description="Specify the chunk size",
+        description="Specify the chunk size (recommended to use with ZIP)",
         default=1,
         min=1
+    )
+
+    s.use_zip = BoolProperty(
+        name="Use zip",
+        description="Use zip to save some bandwitdh",
+        default=False
     )
 
     s.test_render_time = BoolProperty(
