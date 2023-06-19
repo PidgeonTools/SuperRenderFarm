@@ -38,7 +38,7 @@ import time
 
 class SRF_OT_render_button(Operator):
     bl_idname = "superrenderfarm.render"
-    bl_label = "Render with SRF"
+    bl_label = "Render with PRF"
 
     @classmethod
     def poll(cls, context: Context):
@@ -56,16 +56,18 @@ class SRF_OT_render_button(Operator):
             "output_file_format": scene.render.image_settings.file_format,
             "time_per_frame": scene.render_time,
             "chunks": scene.chunk_size,
+            "frame_step": bpy.context.scene.frame_step,
             #"use_zip": scene.use_zip,
         }
 
-        # Try to call SFR
-        try:
-            bpy.ops.render.superfastrender_benchmark()
-            # Save the new settings
-            bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
-        except AttributeError:
-            print("SuperFastRender is NOT installed!")
+        if scene.use_sfr:
+            # Try to call SFR
+            try:
+                bpy.ops.render.superfastrender_benchmark()
+                # Save the new settings
+                bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
+            except AttributeError:
+                print("SuperFastRender is NOT installed!")
 
         if scene.test_render_time:
             startTime = time.time()
@@ -89,12 +91,12 @@ class SRF_OT_render_button(Operator):
                 jO["video_y"] = scene.res_y
 
         jS = json.dumps(jO).replace(" ", "")
-        jS = jS.replace("false", "False")
-        jS = jS.replace("true", "True")
+        jS = jS.replace("False", "false")
+        jS = jS.replace("True", "true")
 
         print(jS)
 
-        subprocess.call([context.preferences.addons[__package__]
+        subprocess.Popen([context.preferences.addons[__package__]
                          .preferences.script_location, jS], creationflags=CREATE_NEW_CONSOLE)
 
         if scene.exit_blender:
@@ -102,17 +104,23 @@ class SRF_OT_render_button(Operator):
 
         return {'FINISHED'}
 
-
 classes = (
     SRF_OT_render_button,
 )
 
+def draw(self, context):
+        layout = self.layout
+        layout.operator("superrenderfarm.render", icon="RENDER_RESULT")
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    bpy.types.TOPBAR_MT_render.prepend(draw)
 
 def unregister():
+
+    bpy.types.TOPBAR_MT_render.remove(draw)
+    
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

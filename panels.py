@@ -80,18 +80,15 @@ class SRF_PT_panel(Panel):
         row = layout.row()
         row = layout.row()
         row = layout.row()
-        row.operator("superrenderfarm.render")  # , text="Overwrite")
-
+        row.operator("superrenderfarm.render", icon="RENDER_RESULT")  # , text="Overwrite")
 
 classes = (
     SRF_PT_panel,
 )
 
-
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-
 
 def unregister():
     for cls in reversed(classes):

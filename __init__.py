@@ -38,8 +38,7 @@ bl_info = {
     "author": "Pidgeon Tools: Crafto1337, Blender Defender",
     "version": (0, 0, 1),
     "blender": (2, 93, 0),
-    # TODO: Maybe find a shorter description. This description is very long.
-    "description": "Setup the render farm directy from Blender without having to start and setting it up manually",
+    "description": "Blender Addon for Pidgeon Render Farm",
     "location": "Properties > Render > Super Render Farm",
     "warning": "",
     "tracker_url": "https://www.github.com/PidgeonTools/SuperRenderFarm/issues",

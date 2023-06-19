@@ -33,7 +33,7 @@ class SRF_APT_Preferences(AddonPreferences):
     bl_idname = __package__
 
     script_location: StringProperty(
-        subtype="DIR_PATH", name="Script Location", description="Installation directory of Red-Render-Farm")
+        subtype="FILE_PATH", name="Script Location", description="Installation directory of Pidgeon Render Farm")
 
     def draw(self, context: Context):
         layout = self.layout
@@ -48,7 +48,6 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-
 
 def unregister():
     for cls in reversed(classes):
