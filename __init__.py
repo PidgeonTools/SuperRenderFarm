@@ -161,7 +161,13 @@ def register_properties():
 
     s.use_sfr = BoolProperty(
         name="Opimize with SFR",
-        description="Use SuperFastRender to find ideal render settings (sampples in relation to time).",
+        description="Use SuperFastRender to find ideal render settings (samples in relation to time).",
+        default=False
+    )
+
+    s.use_sid_temporal = BoolProperty(
+        name="Denoise with SID Temporal",
+        description="Use SuperImageDenoiser Temporal for denoising",
         default=False
     )
 
