@@ -34,7 +34,7 @@ from . import (
 
 
 bl_info = {
-    "name": "Super Render Farm",
+    "name": "Super Render Farm (SRF)",
     "author": "Pidgeon Tools: Crafto1337, Blender Defender",
     "version": (0, 0, 1),
     "blender": (2, 93, 0),
@@ -50,11 +50,10 @@ bl_info = {
 
 def register_properties():
     s = bpy.types.Scene
-    #-----  -----#
 
-    s.chunk_size = IntProperty(
-        name="Chunk size",
-        description="Specify the chunk size (recommended to use with ZIP)",
+    s.batch_size = IntProperty(
+        name="Batch size",
+        description="Specify the batch size (recommended to use with ZIP)",
         default=1,
         min=1
     )

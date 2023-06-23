@@ -37,7 +37,7 @@ class SRF_PT_panel(Panel):
         scene = context.scene
 
         row = layout.row()
-        row.prop(scene, "chunk_size")
+        row.prop(scene, "batch_size")
 
         row = layout.row()
         row.prop(scene, "test_render_time")
@@ -74,6 +74,9 @@ class SRF_PT_panel(Panel):
 
         row = layout.row()
         row.prop(scene, "use_sfr")
+        row = layout.row()
+        row.prop(scene, "use_sid_temporal")
+
         row = layout.row()
         row.prop(scene, "exit_blender")
 

@@ -33,7 +33,7 @@ class SRF_APT_Preferences(AddonPreferences):
     bl_idname = __package__
 
     script_location: StringProperty(
-        subtype="FILE_PATH", name="Script Location", description="Installation directory of Pidgeon Render Farm")
+        subtype="FILE_PATH", name="Script Location", description="Executable of Pidgeon Render Farm")
 
     def draw(self, context: Context):
         layout = self.layout
@@ -43,7 +43,6 @@ class SRF_APT_Preferences(AddonPreferences):
 classes = (
     SRF_APT_Preferences,
 )
-
 
 def register():
     for cls in classes:
