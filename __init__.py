@@ -53,15 +53,9 @@ def register_properties():
 
     s.batch_size = IntProperty(
         name="Batch size",
-        description="Specify the batch size (recommended to use with ZIP)",
+        description="Specify the batch size",
         default=1,
         min=1
-    )
-
-    s.use_zip = BoolProperty(
-        name="Use zip",
-        description="Use zip to save some bandwitdh",
-        default=False
     )
 
     s.test_render_time = BoolProperty(

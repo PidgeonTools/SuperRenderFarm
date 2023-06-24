@@ -74,8 +74,10 @@ class SRF_PT_panel(Panel):
 
         row = layout.row()
         row.prop(scene, "use_sfr")
-        row = layout.row()
-        row.prop(scene, "use_sid_temporal")
+
+        #if bpy.app.version >= (3,5):
+            #row = layout.row()
+            #row.prop(scene, "use_sid_temporal")
 
         row = layout.row()
         row.prop(scene, "exit_blender")

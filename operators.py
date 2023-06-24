@@ -59,8 +59,7 @@ class SRF_OT_render_button(Operator):
             "time_per_frame": scene.render_time,
             "batch_size": scene.batch_size,
             "frame_step": bpy.context.scene.frame_step,
-            "use_sid_temporal": scene.use_sid_temporal,
-            # "use_zip": scene.use_zip,
+            #"use_sid_temporal": scene.use_sid_temporal,
         }
 
         if scene.use_sfr:
