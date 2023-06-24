@@ -1,6 +1,6 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  <User Interface and Blender Addon for Red Render Farm>
+#  <User Interface and Blender Addon for Pidgeon Render Farm>
 #    Copyright (C) <2022>  <Crafto1337>
 #
 #  This program is free software; you can redistribute it and/or
@@ -83,15 +83,19 @@ class SRF_PT_panel(Panel):
         row = layout.row()
         row = layout.row()
         row = layout.row()
-        row.operator("superrenderfarm.render", icon="RENDER_RESULT")  # , text="Overwrite")
+        # , text="Overwrite")
+        row.operator("superrenderfarm.render", icon="RENDER_RESULT")
+
 
 classes = (
     SRF_PT_panel,
 )
 
+
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+
 
 def unregister():
     for cls in reversed(classes):

@@ -1,6 +1,6 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  <User Interface and Blender Addon for Red Render Farm>
+#  <User Interface and Blender Addon for Pidgeon Render Farm>
 #    Copyright (C) <2022>  <Crafto1337>
 #
 #  This program is free software; you can redistribute it and/or
@@ -60,7 +60,7 @@ class SRF_OT_render_button(Operator):
             "batch_size": scene.batch_size,
             "frame_step": bpy.context.scene.frame_step,
             "use_sid_temporal": scene.use_sid_temporal,
-            #"use_zip": scene.use_zip,
+            # "use_zip": scene.use_zip,
         }
 
         if scene.use_sfr:
@@ -75,8 +75,7 @@ class SRF_OT_render_button(Operator):
         if scene.test_render_time:
             startTime = time.time()
             bpy.context.scene.render.filepath = path.join(path.dirname(context.preferences.addons[__package__]
-                                                          .preferences.script_location)
-                                                          , "frame_####")
+                                                                       .preferences.script_location), "frame_####")
             bpy.context.scene.frame_current = bpy.context.scene.frame_start
             bpy.ops.render.render()
             jO["time_per_frame"] = time.time() - startTime
@@ -104,7 +103,7 @@ class SRF_OT_render_button(Operator):
         print(jS)
 
         subprocess.Popen([context.preferences.addons[__package__]
-                         .preferences.script_location, jS], creationflags=CREATE_NEW_CONSOLE)
+                          .preferences.script_location, jS], creationflags=CREATE_NEW_CONSOLE)
 
         if scene.exit_blender:
             bpy.ops.wm.quit_blender()
@@ -132,8 +131,9 @@ class SRF_OT_render_button(Operator):
         x = threading.Thread(target=thread, args=(context,))
         x.start()
 
-        #return {"PASS_THROUGH"}
+        # return {"PASS_THROUGH"}
         return {"FINISHED"}
+
 
 def thread(con):
     scene = con.scene
@@ -146,10 +146,10 @@ def thread(con):
     srf_socket.connect(("192.168.1.37", 19186))
     srf_socket.send("SRF".encode())
 
-    frames:int = 0
+    frames: int = 0
 
     while True:
-        update:str = srf_socket.recv(1024).decode()
+        update: str = srf_socket.recv(1024).decode()
         srf_socket.send("drop".encode())
 
         parts = update.split('|')
@@ -177,13 +177,16 @@ def thread(con):
 
     srf_socket.close()
 
+
 classes = (
     SRF_OT_render_button,
 )
 
+
 def draw(self, context):
-        layout = self.layout
-        layout.operator("superrenderfarm.render", icon="RENDER_RESULT")
+    layout = self.layout
+    layout.operator("superrenderfarm.render", icon="RENDER_RESULT")
+
 
 def register():
     for cls in classes:
@@ -191,9 +194,10 @@ def register():
 
     bpy.types.TOPBAR_MT_render.prepend(draw)
 
+
 def unregister():
 
     bpy.types.TOPBAR_MT_render.remove(draw)
-    
+
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)

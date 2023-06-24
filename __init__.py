@@ -1,6 +1,6 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  <User Interface and Blender Addon for Red Render Farm>
+#  <User Interface and Blender Addon for Pidgeon Render Farm>
 #    Copyright (C) <2022>  <Crafto1337>
 #
 #  This program is free software; you can redistribute it and/or

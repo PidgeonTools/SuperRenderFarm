@@ -1,6 +1,6 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  <User Interface and Blender Addon for Red Render Farm>
+#  <User Interface and Blender Addon for Pidgeon Render Farm>
 #    Copyright (C) <2022>  <Crafto1337>
 #
 #  This program is free software; you can redistribute it and/or
@@ -40,13 +40,16 @@ class SRF_APT_Preferences(AddonPreferences):
 
         layout.prop(self, "script_location")
 
+
 classes = (
     SRF_APT_Preferences,
 )
 
+
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+
 
 def unregister():
     for cls in reversed(classes):
