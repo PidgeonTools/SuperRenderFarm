@@ -38,12 +38,23 @@ import time
 
 
 class SRF_OT_render_button(Operator):
+    """Render the current Blender file with Pidgeon Render Farm"""
     bl_idname = "superrenderfarm.render"
     bl_label = "Render with PRF"
 
     @classmethod
-    def poll(cls, context: Context):
-        return context.active_object is not None
+    def poll(cls, context: 'Context'):
+        prefs = context.preferences.addons[__package__].preferences
+
+        return path.isfile(prefs.script_location)
+
+    @classmethod
+    def description(cls, context: 'Context', properties: 'OperatorProperties') -> str:
+        if cls.poll(context):
+            return "Render the current Blender file with Pidgeon Render Farm"
+
+        return "Render the current Blender file with Pidgeon Render Farm. \
+This requires setting the path to the PRF executable in the addon settings"
 
     def execute(self, context: Context):
         scene = context.scene
