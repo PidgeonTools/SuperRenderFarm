@@ -23,6 +23,7 @@ import bpy
 from bpy.types import (
     Context,
     Operator,
+    OperatorProperties,
 )
 
 import sys
@@ -70,7 +71,7 @@ This requires setting the path to the PRF executable in the addon settings"
             "time_per_frame": scene.render_time,
             "batch_size": scene.batch_size,
             "frame_step": bpy.context.scene.frame_step,
-            #"use_sid_temporal": scene.use_sid_temporal,
+            # "use_sid_temporal": scene.use_sid_temporal,
         }
 
         if scene.use_sfr:
@@ -115,12 +116,12 @@ This requires setting the path to the PRF executable in the addon settings"
         subprocess.Popen([context.preferences.addons[__package__]
                           .preferences.script_location, jS], creationflags=CREATE_NEW_CONSOLE)
 
-        if scene.exit_blender:
-            bpy.ops.wm.quit_blender()
+        # if scene.exit_blender:
+        #     bpy.ops.wm.quit_blender()
 
-        context.window_manager.modal_handler_add(self)
+        # context.window_manager.modal_handler_add(self)
 
-        return {"RUNNING_MODAL"}
+        return {"FINISHED"}
 
     def modal(self, context, event):
         scene = context.scene

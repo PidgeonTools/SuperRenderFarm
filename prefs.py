@@ -22,7 +22,8 @@
 import bpy
 from bpy.types import (
     AddonPreferences,
-    Context
+    Context,
+    UILayout
 )
 from bpy.props import (
     StringProperty
@@ -35,10 +36,13 @@ class SRF_APT_Preferences(AddonPreferences):
     script_location: StringProperty(
         subtype="FILE_PATH", name="Script Location", description="Executable of Pidgeon Render Farm")
 
-    def draw(self, context: Context):
-        layout = self.layout
+    def draw(self, context: 'Context'):
+        layout: 'UILayout' = self.layout
 
-        layout.prop(self, "script_location")
+        layout.separator()
+
+        layout.label(text="Pidgeon Render Farm executable:")
+        layout.prop(self, "script_location", text="")
 
 
 classes = (

@@ -53,13 +53,13 @@ def register_properties():
 
     s.batch_size = IntProperty(
         name="Batch size",
-        description="Specify the batch size",
+        description="How many frames a Client renders before sending them back",
         default=1,
         min=1
     )
 
     s.test_render_time = BoolProperty(
-        name="Test Render Time",
+        name="Approximate Render Time",
         description="Render one test frame to approximate the render time per frame",
         default=False
     )
@@ -74,7 +74,7 @@ def register_properties():
 
     s.file_format = EnumProperty(
         name="File Format",
-        description="Because you have a video format selected, you now have the option to change that.",
+        description="Rendering videos is currently not possible with Pidgeon Render Farm, please specify an alternative file format to use for rendering",
         items=[
             ('PNG', "PNG", ""),
             ('BMP', "BMP", ""),
@@ -114,17 +114,18 @@ def register_properties():
     )
 
     s.vrc = EnumProperty(
-        name="Video Rate Control",
-        description="",
+        name="Encoding Priority",
+        description="Whether the encoder should prioritize constant quality or constant file size",
         items=[
-            ('CBR', "CBR", "Constant Bitrate"),
-            ('CRF', "CRF", "Constant Quality")
+            ('CBR', "File Size", "Constant Bitrate/File Size"),
+            ('CRF', "Quality", "Constant Quality")
         ],
+        default="CRF"
         # update=LoadPreset
     )
 
     s.vrc_value = IntProperty(
-        name="Video Rate Control Value",
+        name="Encoding Priority Value",
         description="Test",
         default=0,
         min=0,
@@ -142,6 +143,7 @@ def register_properties():
         description="Test",
         default=1920,
         min=1,
+        subtype="PIXEL"
         #max = 10
     )
 
@@ -150,12 +152,13 @@ def register_properties():
         description="Test",
         default=1080,
         min=1,
+        subtype="PIXEL"
         #max = 10
     )
 
     s.use_sfr = BoolProperty(
         name="Opimize with SFR",
-        description="Use SuperFastRender to find ideal render settings (samples in relation to time).",
+        description="Use SuperFastRender to find ideal render settings (samples in relation to time)",
         default=False
     )
 
@@ -167,7 +170,7 @@ def register_properties():
 
     s.exit_blender = BoolProperty(
         name="Exit Blender",
-        description="Exit Blender while rendering.",
+        description="Exit Blender while rendering",
         default=False
     )
 

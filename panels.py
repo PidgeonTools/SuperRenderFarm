@@ -36,54 +36,63 @@ class SRF_PT_panel(Panel):
         layout = self.layout
         scene = context.scene
 
-        row = layout.row()
-        row.prop(scene, "batch_size")
-
-        row = layout.row()
-        row.prop(scene, "test_render_time")
-
-        if not scene.test_render_time:
-            row = layout.row()
-            row.prop(scene, "render_time")
+        layout.label(text="Consecutive Frames per Client:")
+        layout.prop(scene, "batch_size", text="")
 
         if bpy.context.scene.render.image_settings.file_format in ["AVI_JPEG", "AVI_RAW", "FFMPEG"]:
-            row = layout.row()
-            row.prop(scene, "file_format")
+            layout.label(text="File Format")
+            layout.prop(scene, "file_format", text="")
 
-        #row = layout.row()
-        #row.prop(scene, "video")
+        # layout.separator()
+        # layout.label(text="Video Settings")
 
-        if scene.video:
+        # row = layout.row()
+        # row.prop(scene, "video")
+
+        if scene.video or False:
+            # todo: Delete this prop
+            # row = layout.row()
+            # row.prop(scene, "fps")
+
+            layout.label(text="Encoding Priority")
             row = layout.row()
-            row.prop(scene, "fps")
+            row.prop(scene, "vrc", text="")
 
             row = layout.row()
-            row.prop(scene, "vrc")
-
-            row = layout.row()
-            row.prop(scene, "vrc_value")
+            row.prop(scene, "vrc_value")  # TODO: Proper label
 
             row = layout.row()
             row.prop(scene, "resize")
 
             if scene.resize:
-                row = layout.row()
-                row.prop(scene, "res_x")
-                #row = layout.row()
-                row.prop(scene, "res_y")
+                grid = layout.grid_flow(columns=1, align=True)
+
+                grid.prop(scene, "res_x", text="Resolution X")
+                grid.prop(scene, "res_y", text="Resolution Y")
+
+        layout.separator()
+
+        layout.label(text="Other Pidgeon Tools Addons")
 
         row = layout.row()
         row.prop(scene, "use_sfr")
 
-        #if bpy.app.version >= (3,5):
-            #row = layout.row()
-            #row.prop(scene, "use_sid_temporal")
+        # if bpy.app.version >= (3,5):
+        #     row = layout.row()
+        #     row.prop(scene, "use_sid_temporal")
+
+        layout.separator()
 
         row = layout.row()
-        row.prop(scene, "exit_blender")
+        row.prop(scene, "test_render_time")
 
-        row = layout.row()
-        row = layout.row()
+        # # # if not scene.test_render_time:
+        # # #     row = layout.row()
+        # # #     row.prop(scene, "render_time")
+
+        # row = layout.row()
+        # row.prop(scene, "exit_blender", text="Exit Blender while rendering")
+
         row = layout.row()
         # , text="Overwrite")
         row.operator("superrenderfarm.render", icon="RENDER_RESULT")
